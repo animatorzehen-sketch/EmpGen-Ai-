@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="bn" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EmpGen - Skill & Consistency Tracker</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Hind Siliguri for Bangla + Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        empdark: {
+                            bg: '#0a0814',
+                            card: '#131027',
+                            sidebar: '#0d0b1a',
+                            border: '#231d45',
+                            hover: '#1b1638',
+                            purpleMain: '#8b5cf6',
+                            purpleLight: '#a78bfa',
+                            accent: '#6366f1'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Hind Siliguri', 'Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0a0814;
+            color: #f3f4f6;
+            font-family: 'Hind Siliguri', 'Inter', sans-serif;
+        }
+
+        .purple-hero-gradient {
+            background: linear-gradient(135deg, #7c3aed 0%, #6366f1 50%, #9333ea 100%);
+        }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%);
+        }
+
+        .btn-gradient:hover {
+            opacity: 0.92;
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+        }
+
+        .card-dark {
+            background-color: #131027;
+            border: 1px solid #231d45;
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+        }
+
+        .active-nav-pill {
+            background: linear-gradient(90deg, #4c1d95 0%, #6d28d9 100%);
+            color: #ffffff;
+            border: 1px solid #8b5cf6;
+            box-shadow: 0 0 16px rgba(139, 92, 246, 0.3);
+        }
+
+        .gold-border {
+            border: 2px solid #f59e0b;
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+        }
+
+        .certificate-border {
+            border: 10px solid #231d45;
+            outline: 2px solid #8b5cf6;
+            outline-offset: -6px;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0d0b1a; }
+        ::-webkit-scrollbar-thumb { background: #231d45; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #8b5cf6; }
+
+        @media print {
+            body * { visibility: hidden; }
+            #printable-certificate, #printable-certificate * { visibility: visible; }
+            #printable-certificate { position: absolute; left: 0; top: 0; width: 100%; background: #0a0814 !important; color: white !important; }
+        }
+    </style>
+</head>
+<body class="flex min-h-screen overflow-x-hidden">
+
+    <!-- LEFT SIDEBAR -->
+    <aside id="sidebar" class="w-64 bg-[#0d0b1a] border-r border-[#1c1836] flex flex-col justify-between fixed lg:static inset-y-0 left-0 z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
+        <div>
+            <!-- Brand Logo Header -->
+            <div class="p-6 flex items-center gap-3.5">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-600 to-fuchsia-600 p-0.5 shadow-lg shadow-purple-900/40 flex items-center justify-center flex-shrink-0">
+                    <div class="w-full h-full bg-[#131027] rounded-[14px] flex items-center justify-center">
+                        <svg viewBox="0 0 100 100" class="w-7 h-7">
+                            <defs>
+                                <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#c084fc" />
+                                    <stop offset="100%" stop-color="#818cf8" />
+                                </linearGradient>
+                            </defs>
+                            <rect x="30" y="18" width="55" height="14" rx="7" fill="url(#logoGrad)" />
+                            <path d="M 65,40 L 35,40 A 16,16 0 0,0 35,72 L 55,72" fill="none" stroke="url(#logoGrad)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="text-xl font-black tracking-widest text-white leading-none">EMPGEN</h1>
+                    <p class="text-[9px] font-bold text-purple-300 tracking-wider uppercase mt-1">GROW & EXCEL DAILY</p>
+                </div>
+            </div>
+
+            <!-- Navigation Menu Links (9 Categories) -->
+            <nav class="px-3 space-y-1.5 text-xs sm:text-sm font-semibold">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3.5 px-4 py-2.5 rounded-2xl transition active-nav-pill">
+                    <i class="fa-solid fa-chart-line text-lg text-purple-300"></i>
+                    <span>ড্যাশবোর্ড (Dashboard)</span>
+                </button>
+                <button onclick="switchTab('skill')" id="nav-skill" class="w-full flex items-center gap-3.5 px-4 py-2.5 rounded-2xl text-gray-300 hover:text-white hover:bg-[#181435] transition">
+                    <i class="fa-solid fa-graduation-cap text-lg text-purple-400"></i>
+                    <span class="text-left">৬ মাসের মাস্টার চ্যালেঞ্জ</span>
+                </button>
+                <button onclick="switchTab('timer')" id="nav-timer" class="w-full flex items-center gap-3.5 px-4 py-2.5 rounded-2xl text-gray-300 hover:text-white hover:bg-[#181435] transition">
+                    <i class="fa-solid fa-stopwatch text-lg text-purple-400"></i>
+                    <span class="text-left flex items-center justify-between w-full">
+                        <span>পড়া/কাজের টাইমার</span>
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                    </span>
+                </button>
+                <button onclick="switchTab('learning')" id="nav-learning" class="w-full flex items-center gap-3.5 px-4 py-2.5 rounded-2xl text-gray-300 hover:text-white hover:bg-[#181435] transition">
+                    <i class="fa-solid fa-book-open text-lg text-purple-400"></i>
+                    <span class="text-left">দৈনিক শেখার লগ</span>
+                </button>
+                <button onclick="switchTab('calendar')" id="nav-calendar" class="w-full flex items-center gap-3.5 px-4 py-2.5 rounded-2xl text-gray-300 hover:text-white hover:bg-[#181435] transition">
+                    <i class="fa-solid fa-calendar-days text-lg text-rose-400"></i>
+                    <span class="text-left flex items-center justify-between w-full">
+                        <span>ক্যালেন্ডার ও সতর্কতা</span>
+                        <span id="nav-missed-count" class="text-[10px] bg-rose-500/30 text-rose-300 border border-rose-500/40 px-1.5 py-0.5 rounded-full font-bold">1 মিস</span>
+                    </span>
+                </button>
+                <button onclick="switchTab('tasks')" id="nav-tasks" class="w-full flex items-center gap-3.5 px-4 py-2.5 rounded-2xl text-gray-300 hover:text-white hover:bg-[#181435] transition">
+                    <i class="fa-solid fa-list-check text-lg text-purple-400"></i>
+                    <span class="text-left">প্রতিদিনের কাজ</span>
+                </button>
+                <button onclick="switchTab('achievements')" id="nav-achievements" class="w-full flex items-center gap-3.5 px-4 py-2.5 rounded-2xl text-gray-300 hover:text-white hover:bg-[#181435] transition">
+                    <i class="fa-solid fa-trophy text-lg text-amber-400"></i>
+                    <span class="text-left flex items-center justify-between w-full">
+                        <span>অ্যাওয়ার্ড ও ব্যাজ</span>
+                        <span class="text-[9px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1.5 py-0.5 rounded-full">Best Learner</span>
+                    </span>
+                </button>
+                <button onclick="switchTab('certificate')" id="nav-certificate" class="w-full flex items-center gap-3.5 px-4 py-2.5 rounded-2xl text-gray-300 hover:text-white hover:bg-[#181435] transition">
+                    <i class="fa-solid fa-certificate text-lg text-purple-400"></i>
+                    <span class="text-left">সার্টিফিকেট গ্যালাক্সি</span>
+                </button>
+                <!-- NEW AI ASSISTANT TAB -->
+                <button onclick="switchTab('ai-assistant')" id="nav-ai-assistant" class="w-full flex items-center gap-3.5 px-4 py-2.5 rounded-2xl text-gray-300 hover:text-white hover:bg-[#181435] transition">
+                    <i class="fa-solid fa-robot text-lg text-cyan-400"></i>
+                    <span class="text-left flex items-center justify-between w-full">
+                        <span>AI অ্যাসিস্ট্যান্ট</span>
+                        <span class="text-[9px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-1.5 py-0.5 rounded-full">New</span>
+                    </span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Sidebar Bottom Streak Card -->
+        <div class="p-4 m-3 bg-[#131027]/90 rounded-3xl flex flex-col items-center justify-center border border-purple-900/50 text-center space-y-2">
+            <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-purple-800 via-purple-600 to-indigo-500 flex items-center justify-center text-amber-400 text-2xl shadow-lg shadow-purple-900/50">
+                <i class="fa-solid fa-fire"></i>
+            </div>
+            <div>
+                <p class="text-[11px] font-medium text-gray-400">বর্তমান স্ট্রিক</p>
+                <p class="text-sm font-extrabold text-white mt-0.5"><span id="streak-days-display">5</span> দিন টানা সক্রিয়!</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <div class="flex-grow flex flex-col min-w-0 bg-empdark-bg">
+        <!-- Top Header -->
+        <header class="h-20 border-b border-empdark-border bg-empdark-sidebar/80 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-30">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleSidebar()" class="lg:hidden text-gray-300 hover:text-white p-2">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+                <div>
+                    <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                        <span id="page-header-title">ড্যাশবোর্ড (Dashboard)</span>
+                    </h2>
+                    <p class="text-xs text-purple-300 font-semibold" id="top-user-sub">লার্নার: Robin Zehen (রবিন যেহেন)</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div class="text-right hidden md:block">
+                    <p id="current-date" class="text-xs font-medium text-purple-300">রবিবার, ২০ সেপ্টেম্বর, ২০২৬</p>
+                    <p class="text-[11px] text-gray-400">"কনসিস্টেন্সিই জয়ের আসল চাবিকাঠি!"</p>
+                </div>
+                <button onclick="switchTab('timer')" class="btn-gradient text-white font-semibold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-lg transition flex items-center gap-2">
+                    <i class="fa-solid fa-stopwatch"></i>
+                    <span>শেখা শুরু করুন</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Dynamic Main Views -->
+        <main class="p-4 sm:p-6 lg:p-8 space-y-6 flex-grow overflow-y-auto">
+
+            <!-- TAB 1: DASHBOARD -->
+            <div id="tab-dashboard" class="tab-content space-y-6">
+                <!-- MISSED DAY DYNAMIC WARNING BANNER -->
+                <div id="missed-day-alert-banner" class="hidden p-4 rounded-2xl bg-rose-950/80 border border-rose-500/70 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl shadow-rose-950/50">
+                    <div class="flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center text-2xl flex-shrink-0 border border-rose-500/40">
+                            <i class="fa-solid fa-triangle-exclamation animate-bounce"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-extrabold text-rose-200">সতর্কতা: কনসিস্টেন্সি ব্রেক হয়েছে!</h4>
+                            <p class="text-xs text-rose-300 mt-0.5" id="missed-alert-text">আপনি সম্প্রতি কোনো একদিন পড়ালেখা বা প্রাকটিস মিস করেছেন। আজকে অন্তত ১ ঘণ্টা পড়ে ক্ষতিপূরণ করুন!</p>
+                        </div>
+                    </div>
+                    <button onclick="switchTab('timer')" class="bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-4 py-2 rounded-xl transition flex-shrink-0">
+                        এখনই পড়তে বসুন →
+                    </button>
+                </div>
+
+                <!-- TOP MOTIVATIONAL HERO BANNER -->
+                <div class="purple-hero-gradient p-6 sm:p-8 rounded-3xl shadow-xl text-white relative overflow-hidden flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+                    <div class="absolute -right-10 -bottom-10 w-56 h-56 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
+                    <div class="space-y-2 max-w-xl relative z-10">
+                        <div class="inline-flex items-center gap-2 bg-black/20 px-3 py-1 rounded-full text-xs font-bold text-purple-200 border border-white/10">
+                            <i class="fa-solid fa-fire text-amber-300"></i> দৈনন্দিন মাইন্ডসেট ও টার্গেট
+                        </div>
+                        <h3 class="text-xl sm:text-2xl font-black tracking-wide leading-snug">
+                            "আজকে না শিখলে কাল ১ দিন পিছিয়ে পড়বে! কোনো অজুহাত চলবে না।"
+                        </h3>
+                        <p class="text-xs text-purple-200 font-medium">
+                            লক্ষ্য: ৬ মাসে **গ্রাফিক্স ডিজাইন** ও **ই-কমার্স** এর ওপর প্রফেশনাল মাস্টার হওয়া।
+                        </p>
+                    </div>
+
+                    <!-- Best Learner Card Widget -->
+                    <div onclick="switchTab('achievements')" class="bg-black/40 backdrop-blur-md p-4 rounded-2xl border border-amber-400/40 flex items-center gap-3 cursor-pointer hover:bg-black/50 transition relative z-10">
+                        <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg">
+                            <i class="fa-solid fa-crown"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-[10px] font-extrabold text-amber-300 uppercase tracking-wide">Best Skill Learner</span>
+                                <i class="fa-solid fa-circle-check text-xs text-emerald-400"></i>
+                            </div>
+                            <p class="text-sm font-black text-white" id="dash-learner-name">Robin Zehen (রবিন যেহেন)</p>
+                            <p class="text-[10px] text-gray-300">স্কোর: ৯৮% | মাসিক টার্গেট পূরণ</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STATS OVERVIEW CARDS -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="card-dark p-5 rounded-2xl flex justify-between items-start">
+                        <div>
+                            <p class="text-xs text-gray-400 font-medium">মোট পড়ার সময়</p>
+                            <h4 class="text-2xl font-black text-white mt-2" id="stat-total-time">২৪ ঘণ্টা ৪৫ মি.</h4>
+                            <span class="text-[11px] text-emerald-400 font-semibold flex items-center gap-1 mt-1">
+                                <i class="fa-solid fa-arrow-up"></i> নিয়মিত অগ্রগতি
+                            </span>
+                        </div>
+                        <div class="w-10 h-10 rounded-2xl bg-purple-900/40 text-purple-400 flex items-center justify-center text-lg border border-purple-800/40">
+                            <i class="fa-solid fa-clock"></i>
+                        </div>
+                    </div>
+
+                    <div class="card-dark p-5 rounded-2xl flex justify-between items-start">
+                        <div>
+                            <p class="text-xs text-gray-400 font-medium">গ্রাফিক্স ডিজাইন উন্নতি</p>
+                            <h4 class="text-2xl font-black text-white mt-2" id="stat-graphics-prog">৪৫%</h4>
+                            <span class="text-[11px] text-purple-300 font-semibold mt-1 block">Photoshop & Figma</span>
+                        </div>
+                        <div class="w-10 h-10 rounded-2xl bg-indigo-900/40 text-indigo-400 flex items-center justify-center text-lg border border-indigo-800/40">
+                            <i class="fa-solid fa-palette"></i>
+                        </div>
+                    </div>
+
+                    <div class="card-dark p-5 rounded-2xl flex justify-between items-start">
+                        <div>
+                            <p class="text-xs text-gray-400 font-medium">ই-কমার্স উন্নতি</p>
+                            <h4 class="text-2xl font-black text-white mt-2" id="stat-ecom-prog">৪০%</h4>
+                            <span class="text-[11px] text-indigo-300 font-semibold mt-1 block">Shopify & Product Ads</span>
+                        </div>
+                        <div class="w-10 h-10 rounded-2xl bg-purple-900/40 text-fuchsia-400 flex items-center justify-center text-lg border border-fuchsia-800/40">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                        </div>
+                    </div>
+
+                    <div class="card-dark p-5 rounded-2xl flex justify-between items-start">
+                        <div>
+                            <p class="text-xs text-gray-400 font-medium">কনসিস্টেন্সি রেট</p>
+                            <h4 class="text-2xl font-black text-white mt-2" id="stat-consistency-rate">৯১.৬%</h4>
+                            <span class="text-[11px] text-rose-400 font-semibold mt-1 block" id="stat-missed-summary">১ দিন মিস হয়েছে</span>
+                        </div>
+                        <div class="w-10 h-10 rounded-2xl bg-amber-900/40 text-amber-400 flex items-center justify-center text-lg border border-amber-800/40">
+                            <i class="fa-solid fa-calendar-check"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CHARTS ROW -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 card-dark p-6 rounded-2xl">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-chart-column text-purple-400"></i>
+                                <span>গত ৭ দিনের দৈনন্দিন পড়ার সময় (ঘণ্টা)</span>
+                            </h3>
+                            <span class="text-xs text-gray-400 bg-empdark-bg px-2.5 py-1 rounded-lg border border-empdark-border">গ্রাফিক্স ও ই-কমার্স</span>
+                        </div>
+                        <div class="h-60 relative">
+                            <canvas id="barChartLearning"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="card-dark p-6 rounded-2xl">
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2 mb-4">
+                            <i class="fa-solid fa-chart-pie text-purple-400"></i>
+                            <span>স্কিল ডিস্ট্রিবিউশন</span>
+                        </h3>
+                        <div class="h-52 relative flex justify-center items-center">
+                            <canvas id="donutChartTasks"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BOTTOM WIDGETS -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="card-dark p-6 rounded-2xl space-y-4">
+                        <div class="flex justify-between items-center border-b border-empdark-border pb-3">
+                            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-clock-rotate-left text-purple-400"></i>
+                                <span>সর্বশেষ টাইমার পড়া/কাজের লগ</span>
+                            </h3>
+                            <button onclick="switchTab('learning')" class="text-xs text-purple-400 hover:underline">সব দেখুন →</button>
+                        </div>
+                        <div id="recent-timer-logs" class="space-y-3"></div>
+                    </div>
+
+                    <div class="card-dark p-6 rounded-2xl space-y-4">
+                        <div class="flex justify-between items-center border-b border-empdark-border pb-3">
+                            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-list-check text-purple-400"></i>
+                                <span>আজকের টাস্ক ও রোডম্যাপ</span>
+                            </h3>
+                            <button onclick="switchTab('tasks')" class="text-xs text-purple-400 hover:underline">ম্যানেজ করুন</button>
+                        </div>
+                        <div id="today-todo-list" class="space-y-2.5"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: 6-MONTH SKILL MASTER -->
+            <div id="tab-skill" class="tab-content hidden space-y-6">
+                <div class="card-dark p-6 sm:p-8 rounded-3xl space-y-4">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-empdark-border pb-4">
+                        <div>
+                            <span class="text-[10px] font-extrabold uppercase tracking-widest text-purple-400 bg-purple-950 px-3 py-1 rounded-full border border-purple-800">
+                                6-MONTH ROADMAP TO MASTERY
+                            </span>
+                            <h2 class="text-2xl font-black text-white mt-2">গ্রাফিক্স ডিজাইন ও ই-কমার্স মাস্টার চ্যালেঞ্জ</h2>
+                            <p class="text-xs text-gray-400 mt-1">রবিন যেহেন (Robin Zehen)-এর ৬ মাসের সুনির্দিষ্ট শেখার রোডম্যাপ</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-3 py-1.5 rounded-xl">
+                                <i class="fa-solid fa-bullseye"></i> দৈনিক টার্গেট: ২.৫ ঘণ্টা
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- GRAPHICS DESIGN SECTION -->
+                    <div class="space-y-4 pt-2">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-base font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-palette text-purple-400"></i>
+                                <span>১. গ্রাফিক্স ডিজাইন মাস্টার ট্র্যাক (Graphics Design)</span>
+                            </h3>
+                            <span class="text-xs font-bold text-purple-300" id="graphics-percent-label">৪৫% সম্পন্ন</span>
+                        </div>
+                        <div class="w-full bg-empdark-bg h-3 rounded-full overflow-hidden border border-empdark-border">
+                            <div id="graphics-progress-bar" class="bg-gradient-to-r from-purple-600 to-indigo-500 h-full rounded-full transition-all duration-500" style="width: 45%"></div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+                            <label class="p-3 bg-empdark-bg rounded-xl border border-empdark-border flex items-center gap-3 cursor-pointer hover:border-purple-800 transition">
+                                <input type="checkbox" checked onchange="toggleRoadmapItem('g1')" class="accent-purple-600 w-4 h-4 rounded">
+                                <div>
+                                    <p class="text-xs font-bold text-white">Photoshop - ব্যানার, সোশ্যাল মিডিয়া পোস্ট, ছবি এডিটিং</p>
+                                    <p class="text-[10px] text-gray-400">টুলস, লেয়ার মাস্কিং, কালার কারেকশন</p>
+                                </div>
+                            </label>
+                            <label class="p-3 bg-empdark-bg rounded-xl border border-empdark-border flex items-center gap-3 cursor-pointer hover:border-purple-800 transition">
+                                <input type="checkbox" checked onchange="toggleRoadmapItem('g2')" class="accent-purple-600 w-4 h-4 rounded">
+                                <div>
+                                    <p class="text-xs font-bold text-white">Adobe Illustrator - লোগো, ভেক্টর ও ব্র্যান্ডিং ডিজাইন</p>
+                                    <p class="text-[10px] text-gray-400">পেন টুল, শেপ বিল্ডার, টাইপোগ্রাফি</p>
+                                </div>
+                            </label>
+                            <label class="p-3 bg-empdark-bg rounded-xl border border-empdark-border flex items-center gap-3 cursor-pointer hover:border-purple-800 transition">
+                                <input type="checkbox" onchange="toggleRoadmapItem('g3')" class="accent-purple-600 w-4 h-4 rounded">
+                                <div>
+                                    <p class="text-xs font-bold text-white">Figma - ই-কমার্স UI/UX ল্যান্ডিং পেজ ডিজাইন</p>
+                                    <p class="text-[10px] text-gray-400">আউটপুট প্রোটোটাইপিং ও ওয়েব অ্যাপ ডিজাইন</p>
+                                </div>
+                            </label>
+                            <label class="p-3 bg-empdark-bg rounded-xl border border-empdark-border flex items-center gap-3 cursor-pointer hover:border-purple-800 transition">
+                                <input type="checkbox" onchange="toggleRoadmapItem('g4')" class="accent-purple-600 w-4 h-4 rounded">
+                                <div>
+                                    <p class="text-xs font-bold text-white">প্যাকেজিং ও অ্যাডভার্টাইজিং আর্টওয়ার্ক</p>
+                                    <p class="text-[10px] text-gray-400">প্রোডাক্ট মকআপ ও প্রিন্ট রেডি ফাইল</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- E-COMMERCE SECTION -->
+                    <div class="space-y-4 pt-6 border-t border-empdark-border">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-base font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-cart-shopping text-fuchsia-400"></i>
+                                <span>২. ই-কমার্স বিজনেস ও মার্কেটিং ট্র্যাক (E-Commerce)</span>
+                            </h3>
+                            <span class="text-xs font-bold text-fuchsia-300" id="ecom-percent-label">৪০% সম্পন্ন</span>
+                        </div>
+                        <div class="w-full bg-empdark-bg h-3 rounded-full overflow-hidden border border-empdark-border">
+                            <div id="ecom-progress-bar" class="bg-gradient-to-r from-fuchsia-600 to-purple-500 h-full rounded-full transition-all duration-500" style="width: 40%"></div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+                            <label class="p-3 bg-empdark-bg rounded-xl border border-empdark-border flex items-center gap-3 cursor-pointer hover:border-purple-800 transition">
+                                <input type="checkbox" checked onchange="toggleRoadmapItem('e1')" class="accent-purple-600 w-4 h-4 rounded">
+                                <div>
+                                    <p class="text-xs font-bold text-white">Shopify & WooCommerce স্টোর সেটিং ও কাস্টমাইজেশন</p>
+                                    <p class="text-[10px] text-gray-400">থিম সেটআপ, প্রোডাক্ট আপলোড, পেমেন্ট গেটওয়ে</p>
+                                </div>
+                            </label>
+                            <label class="p-3 bg-empdark-bg rounded-xl border border-empdark-border flex items-center gap-3 cursor-pointer hover:border-purple-800 transition">
+                                <input type="checkbox" checked onchange="toggleRoadmapItem('e2')" class="accent-purple-600 w-4 h-4 rounded">
+                                <div>
+                                    <p class="text-xs font-bold text-white">প্রোডাক্ট রিসার্চ ও উইনিং প্রোডাক্ট সিলেকশন</p>
+                                    <p class="text-[10px] text-gray-400">সোর্সিং, প্রাইসিং স্ট্র্যাটেজি ও প্রফিট মার্জিন</p>
+                                </div>
+                            </label>
+                            <label class="p-3 bg-empdark-bg rounded-xl border border-empdark-border flex items-center gap-3 cursor-pointer hover:border-purple-800 transition">
+                                <input type="checkbox" onchange="toggleRoadmapItem('e3')" class="accent-purple-600 w-4 h-4 rounded">
+                                <div>
+                                    <p class="text-xs font-bold text-white">Facebook/Instagram Ads & TikTok Marketing Mastery</p>
+                                    <p class="text-[10px] text-gray-400">পিক্সেল ট্র্যাকিং, টার্গেটিং ও কপিরাইটিং</p>
+                                </div>
+                            </label>
+                            <label class="p-3 bg-empdark-bg rounded-xl border border-empdark-border flex items-center gap-3 cursor-pointer hover:border-purple-800 transition">
+                                <input type="checkbox" onchange="toggleRoadmapItem('e4')" class="accent-purple-600 w-4 h-4 rounded">
+                                <div>
+                                    <p class="text-xs font-bold text-white">সেলস ফানেল, অটোমেশন ও কাস্টমার সাপোর্ট</p>
+                                    <p class="text-[10px] text-gray-400">ইমেইল মার্কেটিং, রিকভার চ্যাটবট</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: STUDY TIMER -->
+            <div id="tab-timer" class="tab-content hidden space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-1 card-dark p-6 rounded-3xl space-y-6 text-center border border-purple-800/50">
+                        <div>
+                            <span class="text-[10px] font-extrabold uppercase tracking-widest text-emerald-400 bg-emerald-950 px-3 py-1 rounded-full border border-emerald-800">
+                                LIVE STUDY TIMER
+                            </span>
+                            <h3 class="text-xl font-bold text-white mt-2">পড়া/কাজের লাইভ টাইমার</h3>
+                            <p class="text-xs text-gray-400">কখন বসছেন এবং কতক্ষণ শিখছেন তা নির্ভুল হিসাব রাখুন</p>
+                        </div>
+
+                        <div class="p-6 bg-empdark-bg rounded-3xl border border-purple-900/60 shadow-inner space-y-2">
+                            <div id="timer-display" class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-indigo-300 to-fuchsia-300 font-mono">
+                                00:00:00
+                            </div>
+                            <p id="start-time-indicator" class="text-[11px] text-gray-400">কখন বসেছেন: --:--</p>
+                        </div>
+
+                        <div class="text-left space-y-1.5">
+                            <label class="text-xs font-bold text-gray-300">কোন বিষয় শিখছেন?</label>
+                            <select id="timer-topic-select" class="w-full bg-empdark-bg border border-empdark-border rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-purple-500">
+                                <option value="Graphics Design">গ্রাফিক্স ডিজাইন (Photoshop/Illustrator/Figma)</option>
+                                <option value="E-Commerce">ই-কমার্স (Shopify/Ads/Sourcing)</option>
+                                <option value="General Skill">অন্যান্য স্কিল ডেভেলপমেন্ট</option>
+                            </select>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-2">
+                            <button id="btn-timer-start" onclick="startTimer()" class="bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-xl font-bold text-xs shadow-lg transition flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-play"></i> শুরু
+                            </button>
+                            <button id="btn-timer-pause" onclick="pauseTimer()" disabled class="bg-amber-600 opacity-50 hover:bg-amber-500 text-white py-3 rounded-xl font-bold text-xs shadow-lg transition flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-pause"></i> থামান
+                            </button>
+                            <button id="btn-timer-stop" onclick="stopAndSaveTimer()" disabled class="bg-rose-600 opacity-50 hover:bg-rose-500 text-white py-3 rounded-xl font-bold text-xs shadow-lg transition flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-square"></i> সেভ
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-2 card-dark p-6 rounded-3xl space-y-4">
+                        <div class="flex justify-between items-center border-b border-empdark-border pb-3">
+                            <div>
+                                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-list-ul text-purple-400"></i>
+                                    <span>আজকের পড়া/কাজের সম্পূর্ণ তালিকা</span>
+                                </h3>
+                                <p class="text-xs text-gray-400">তারিখ, শুরুর সময় ও মোট স্থায়িত্বসহ হিসাব</p>
+                            </div>
+                            <span id="today-total-timer-time" class="text-xs font-extrabold text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-3 py-1.5 rounded-xl">
+                                আজ মোট: ২ ঘণ্টা
+                            </span>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="border-b border-empdark-border text-gray-400">
+                                        <th class="pb-2 font-bold">তারিখ ও বার</th>
+                                        <th class="pb-2 font-bold">বিষয়</th>
+                                        <th class="pb-2 font-bold">কখন বসা</th>
+                                        <th class="pb-2 font-bold">সময়সীমা</th>
+                                        <th class="pb-2 font-bold text-right">একশন</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="timer-sessions-tbody" class="divide-y divide-empdark-border text-gray-300">
+                                    <!-- Dynamic rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: DAILY LEARNING -->
+            <div id="tab-learning" class="tab-content hidden space-y-6">
+                <div class="card-dark p-6 rounded-2xl flex justify-between items-center">
+                    <div>
+                        <h3 class="text-lg font-bold text-white">দৈনিক শিক্ষা লগ (Daily Learning History)</h3>
+                        <p class="text-xs text-gray-400">প্রতিদিনের বিস্তারিত নোট ও শিখন ফলাফল</p>
+                    </div>
+                    <button onclick="openEntryModal()" class="btn-gradient text-white text-xs px-4 py-2 rounded-xl font-bold">
+                        + নতুন শিক্ষা নোট
+                    </button>
+                </div>
+                <div id="learning-full-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            </div>
+
+            <!-- TAB 5: MONTHLY CALENDAR -->
+            <div id="tab-calendar" class="tab-content hidden space-y-6">
+                <div class="card-dark p-6 sm:p-8 rounded-3xl space-y-6">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-empdark-border pb-4">
+                        <div>
+                            <span class="text-[10px] font-extrabold uppercase tracking-widest text-rose-400 bg-rose-950 px-3 py-1 rounded-full border border-rose-800">
+                                MONTHLY CONSISTENCY TRACKER
+                            </span>
+                            <h2 class="text-2xl font-black text-white mt-2">মাসিক ক্যালেন্ডার ও কনসিস্টেন্সি রিপোর্ট</h2>
+                            <p class="text-xs text-gray-400 mt-1">সবুজ দিন = সক্রিয় শেখা | লাল দিন = মিস হওয়া দিন</p>
+                        </div>
+
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs font-bold text-rose-300 bg-rose-950/60 border border-rose-800/60 px-3 py-1.5 rounded-xl">
+                                <i class="fa-solid fa-triangle-exclamation"></i> মিসড দিন: ১টি
+                            </span>
+                            <span class="text-xs font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-3 py-1.5 rounded-xl">
+                                <i class="fa-solid fa-circle-check"></i> সক্রিয় দিন: ১১টি
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-7 gap-2 text-center text-xs font-extrabold text-purple-300 py-2 border-b border-empdark-border">
+                        <div>রবি</div>
+                        <div>সোম</div>
+                        <div>মঙ্গল</div>
+                        <div>বুধ</div>
+                        <div>বৃহঃ</div>
+                        <div>শুক্র</div>
+                        <div>শনি</div>
+                    </div>
+
+                    <div id="monthly-calendar-grid" class="grid grid-cols-7 gap-2 text-xs"></div>
+
+                    <div class="p-4 bg-empdark-bg rounded-2xl border border-empdark-border flex flex-col sm:flex-row justify-between items-center gap-4 text-xs">
+                        <div class="flex items-center gap-4">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                                <span class="text-gray-300 font-semibold">পড়াশোনা সম্পন্ন (Active)</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-rose-500 animate-pulse"></span>
+                                <span class="text-gray-300 font-semibold">কনসিস্টেন্সি মিসড (Missed)</span>
+                            </div>
+                        </div>
+                        <p class="text-gray-400">যেসব দিনে কাজ করেননি, সেগুলোতে লাল মার্ক দেখানো হবে!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 6: DAILY TASKS -->
+            <div id="tab-tasks" class="tab-content hidden space-y-6">
+                <div class="card-dark p-6 rounded-2xl">
+                    <h3 class="text-lg font-bold text-white mb-4">প্রতিদিনের টু-ডু কাজ (Daily Tasks)</h3>
+                    <div id="all-tasks-manage-list" class="space-y-3"></div>
+                </div>
+            </div>
+
+            <!-- TAB 7: ACHIEVEMENTS -->
+            <div id="tab-achievements" class="tab-content hidden space-y-6">
+                <div class="card-dark gold-border p-6 sm:p-8 rounded-3xl relative overflow-hidden bg-gradient-to-r from-[#17112e] via-[#1f173b] to-[#17112e]">
+                    <div class="absolute -right-10 -top-10 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                    <div class="flex flex-col lg:flex-row items-center justify-between gap-6 relative z-10">
+                        <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 text-center sm:text-left">
+                            <div class="relative">
+                                <div class="w-20 h-20 rounded-2xl bg-gradient-to-tr from-amber-500 via-yellow-400 to-amber-200 p-1 shadow-xl shadow-amber-900/30 flex items-center justify-center">
+                                    <div class="w-full h-full bg-[#131027] rounded-[12px] flex items-center justify-center text-amber-400 text-3xl font-black">
+                                        <i class="fa-solid fa-trophy"></i>
+                                    </div>
+                                </div>
+                                <span class="absolute -bottom-2 -right-2 bg-amber-500 text-slate-950 font-black text-[10px] px-2 py-0.5 rounded-full shadow-md">#1 TOP</span>
+                            </div>
+
+                            <div class="space-y-1">
+                                <div class="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 px-3 py-1 rounded-full text-amber-300 font-bold text-xs">
+                                    <i class="fa-solid fa-award"></i> BEST SKILL LEARNER OF THE MONTH
+                                </div>
+                                <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">
+                                    <span class="text-amber-300">Robin Zehen</span> (রবিন যেহেন)
+                                </h2>
+                                <p class="text-xs text-gray-300 max-w-md leading-relaxed">
+                                    গ্রাফিক্স ডিজাইন ও ই-কমার্স লার্নিংয়ে সর্বোচ্চ ধারাবাহিকতা প্রদর্শনের জন্য বিশেষ সম্মাননা।
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                            <button onclick="openLearnerAwardModal()" class="btn-gradient text-white px-5 py-3 rounded-2xl text-xs font-bold shadow-xl flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-medal"></i>
+                                <span>অ্যাওয়ার্ড সার্টিফিকেট দেখুন</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-dark p-6 rounded-2xl">
+                    <h3 class="text-lg font-bold text-white mb-4">অর্জন ও ব্যাজ (Badges)</h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                        <div class="p-4 bg-empdark-bg border border-amber-500/50 rounded-2xl text-center space-y-2">
+                            <div class="w-12 h-12 mx-auto rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl shadow-lg">
+                                <i class="fa-solid fa-crown"></i>
+                            </div>
+                            <h4 class="text-xs font-bold text-white">Best Learner</h4>
+                            <p class="text-[10px] text-amber-300 font-bold">Robin Zehen (Awarded)</p>
+                        </div>
+                        <div class="p-4 bg-empdark-bg border border-purple-900/40 rounded-2xl text-center space-y-2">
+                            <div class="w-12 h-12 mx-auto rounded-full bg-purple-900/50 text-purple-300 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-fire"></i>
+                            </div>
+                            <h4 class="text-xs font-bold text-white">৫ দিন টানা স্ট্রিক</h4>
+                            <p class="text-[10px] text-emerald-400 font-semibold">আনলকড!</p>
+                        </div>
+                        <div class="p-4 bg-empdark-bg border border-empdark-border rounded-2xl text-center space-y-2">
+                            <div class="w-12 h-12 mx-auto rounded-full bg-indigo-900/50 text-indigo-400 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-palette"></i>
+                            </div>
+                            <h4 class="text-xs font-bold text-white">গ্রাফিক্স ডিসাইপল</h4>
+                            <p class="text-[10px] text-emerald-400 font-semibold">আনলকড!</p>
+                        </div>
+                        <div class="p-4 bg-empdark-bg border border-empdark-border rounded-2xl text-center space-y-2 opacity-60">
+                            <div class="w-12 h-12 mx-auto rounded-full bg-gray-800 text-gray-400 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-cart-shopping"></i>
+                            </div>
+                            <h4 class="text-xs font-bold text-gray-300">ই-কমার্স বিজয়ার</h4>
+                            <p class="text-[10px] text-gray-500 font-semibold">চলমান</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 8: CERTIFICATE GENERATOR (UPDATED 4 CATEGORIES WITH LOCK/UNLOCK) -->
+            <div id="tab-certificate" class="tab-content hidden space-y-6">
+                <!-- Certificate Category Selector Tabs -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <button onclick="switchCertCategory('daily')" id="cert-cat-daily" class="p-4 rounded-2xl card-dark border-purple-500 text-white font-bold text-xs flex flex-col items-center gap-2 transition hover:bg-purple-900/20">
+                        <i class="fa-solid fa-calendar-day text-xl text-purple-400"></i>
+                        <span>১. দৈনিক সার্টিফিকেট</span>
+                        <span id="daily-status-badge" class="text-[9px] px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30">লকড 🔒</span>
+                    </button>
+
+                    <button onclick="switchCertCategory('weekly')" id="cert-cat-weekly" class="p-4 rounded-2xl card-dark text-gray-400 font-bold text-xs flex flex-col items-center gap-2 transition hover:bg-purple-900/20">
+                        <i class="fa-solid fa-calendar-week text-xl text-emerald-400"></i>
+                        <span>২. সাপ্তাহিক সার্টিফিকেট</span>
+                        <span class="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">আনলকড 🔓</span>
+                    </button>
+
+                    <button onclick="switchCertCategory('monthly')" id="cert-cat-monthly" class="p-4 rounded-2xl card-dark text-gray-400 font-bold text-xs flex flex-col items-center gap-2 transition hover:bg-purple-900/20">
+                        <i class="fa-solid fa-calendar-check text-xl text-amber-400"></i>
+                        <span>৩. মাসিক সার্টিফিকেট</span>
+                        <span class="text-[9px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">আনলকড 🔓</span>
+                    </button>
+
+                    <button onclick="switchCertCategory('overtime')" id="cert-cat-overtime" class="p-4 rounded-2xl card-dark text-gray-400 font-bold text-xs flex flex-col items-center gap-2 transition hover:bg-purple-900/20">
+                        <i class="fa-solid fa-bolt text-xl text-fuchsia-400"></i>
+                        <span>৪. এক্সট্রা আওয়ার সার্টিফিকেট</span>
+                        <span class="text-[9px] px-2 py-0.5 rounded-full bg-fuchsia-500/20 text-fuchsia-300 border border-fuchsia-500/30">আনলকড 🔓</span>
+                    </button>
+                </div>
+
+                <div class="card-dark p-6 rounded-2xl space-y-6">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-empdark-border pb-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-white flex items-center gap-2" id="cert-category-title">
+                                <i class="fa-solid fa-certificate text-amber-400"></i>
+                                <span>১. দৈনিক অর্জন সার্টিফিকেট (Daily Task Completion)</span>
+                            </h3>
+                            <p class="text-xs text-gray-400 mt-1" id="cert-category-desc">আজকের সব নির্ধারিত টাস্ক সম্পন্ন হলে সার্টিফিকেট অফিশিয়ালি আনলক হবে।</p>
+                        </div>
+
+                        <div class="flex items-center gap-3 w-full md:w-auto">
+                            <input type="text" id="cert-user-name" value="Robin Zehen" oninput="updateCertName(this.value)" placeholder="আপনার নাম লিখুন" class="bg-empdark-bg border border-empdark-border px-3 py-2 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500 flex-grow md:w-48">
+                            <button id="cert-download-btn" onclick="printOrWarnCert()" class="btn-gradient text-white text-xs px-4 py-2.5 rounded-xl font-bold flex items-center gap-2 flex-shrink-0 opacity-50 cursor-not-allowed">
+                                <i class="fa-solid fa-download"></i>
+                                <span>সার্টিফিকেট প্রিন্ট/ডাউনলোড</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- CERTIFICATE CONTAINER -->
+                    <div class="relative">
+                        <!-- LOCKED OVERLAY FOR DAILY CERTIFICATE IF NOT COMPLETE -->
+                        <div id="cert-locked-overlay" class="absolute inset-0 bg-black/85 backdrop-blur-md rounded-2xl z-20 flex flex-col items-center justify-center p-6 text-center space-y-3">
+                            <div class="w-16 h-16 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-400 flex items-center justify-center text-2xl animate-bounce">
+                                <i class="fa-solid fa-lock"></i>
+                            </div>
+                            <h3 class="text-xl font-black text-white">সার্টিফিকেটটি এখনো লক রয়েছে!</h3>
+                            <p class="text-xs text-gray-300 max-w-md">
+                                আজকের সব কাজ সম্পন্ন না করা পর্যন্ত সার্টিফিকেট আনলক হবে না। দৈনিক সব টাস্ক সম্পন্ন করুন এবং অটোমেটিক আনলক উপভোগ করুন!
+                            </p>
+                            <button onclick="switchTab('tasks')" class="btn-gradient text-white font-bold text-xs px-5 py-2.5 rounded-xl">
+                                আজকের টাস্ক দেখতে ক্লিক করুন →
+                            </button>
+                        </div>
+
+                        <!-- Printable Certificate Body -->
+                        <div id="printable-certificate" class="card-dark p-8 md:p-12 rounded-2xl certificate-border relative overflow-hidden text-center space-y-6 my-4 bg-gradient-to-b from-[#131027] via-[#0d0b1a] to-[#131027]">
+                            <div class="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
+                                <i class="fa-solid fa-award text-[280px] text-purple-400"></i>
+                            </div>
+
+                            <div class="space-y-2 relative z-10">
+                                <div class="flex items-center justify-center gap-3">
+                                    <div class="w-8 h-8 rounded-xl bg-purple-600 flex items-center justify-center text-white font-bold text-sm">
+                                        <i class="fa-solid fa-bolt"></i>
+                                    </div>
+                                    <h2 class="text-xl font-black tracking-widest text-white">EMPGEN ACADEMY</h2>
+                                </div>
+                                <p id="cert-badge-type" class="text-[10px] uppercase font-bold tracking-widest text-purple-400">DAILY SKILL ACCOMPLISHMENT CERTIFICATE</p>
+                            </div>
+
+                            <div class="w-24 h-0.5 bg-gradient-to-r from-transparent via-purple-500 to-transparent mx-auto"></div>
+
+                            <div class="space-y-3 relative z-10 max-w-xl mx-auto">
+                                <p class="text-xs text-gray-400 uppercase tracking-wide">এটি বিশ্বস্ততার সাথে প্রত্যায়ন করা হচ্ছে যে</p>
+                                <h1 id="cert-display-name" class="text-2xl sm:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-200 via-purple-400 to-fuchsia-300 py-1">
+                                    Robin Zehen
+                                </h1>
+                                <p id="cert-body-text" class="text-xs text-gray-300 leading-relaxed">
+                                    সফলতা ও দক্ষতার সাথে EmpGen প্ল্যাটফর্মে আজকের দিনের নির্ধারিত **গ্রাফিক্স ডিজাইন ও ই-কমার্স লার্নিং** টাস্কগুলো সম্পন্ন করেছেন।
+                                </p>
+                            </div>
+
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 pt-6 border-t border-empdark-border text-center text-xs relative z-10">
+                                <div>
+                                    <p class="text-[10px] text-gray-500">তারিখ</p>
+                                    <p id="cert-date-display" class="font-bold text-purple-300 mt-1">২০ সেপ্টেম্বর, ২০২৬</p>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] text-gray-500">স্ট্যাটাস</p>
+                                    <p class="font-bold text-emerald-400 mt-1 flex items-center justify-center gap-1">
+                                        <i class="fa-solid fa-verified"></i> VERIFIED
+                                    </p>
+                                </div>
+                                <div class="col-span-2 md:col-span-1">
+                                    <p class="text-[10px] text-gray-500">স্বাক্ষর</p>
+                                    <p class="font-serif italic font-bold text-purple-400 text-sm mt-1">EmpGen Authority</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 9: AI ASSISTANT (NEW FEATURE) -->
+            <div id="tab-ai-assistant" class="tab-content hidden space-y-6">
+                <div class="card-dark p-6 rounded-3xl space-y-6 border border-cyan-500/30">
+                    <div class="flex items-center gap-4 border-b border-empdark-border pb-4">
+                        <div class="w-12 h-12 rounded-2xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-2xl border border-cyan-500/40">
+                            <i class="fa-solid fa-robot"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white">EmpGen AI স্মার্ট লার্নিং অ্যাসিস্ট্যান্ট</h3>
+                            <p class="text-xs text-gray-400">গ্রাফিক্স ডিজাইন, ই-কমার্স বা যেকোনো সহায়তার জন্য AI-কে প্রশ্ন করুন</p>
+                        </div>
+                    </div>
+
+                    <!-- AI Chat Display Area -->
+                    <div class="bg-empdark-bg p-4 rounded-2xl border border-empdark-border h-80 overflow-y-auto space-y-3" id="ai-chat-box">
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-full bg-cyan-600 flex items-center justify-center text-white text-xs font-bold">AI</div>
+                            <div class="bg-[#181435] p-3 rounded-2xl text-xs text-gray-200 max-w-md border border-purple-900/40">
+                                হ্যালো রবিন! আমি আপনার AI লার্নিং গাইড। আজকে আপনার গ্রাফিক্স ডিজাইন বা ই-কমার্স নিয়ে কোনো প্রশ্ন আছে কি?
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Input Area -->
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="ai-input-prompt" placeholder="এখানে AI-কে প্রশ্ন লিখুন (যেমন: Photoshop Pen Tool ব্যবহারের সহজ নিয়ম কী?)..." class="flex-grow bg-empdark-bg border border-empdark-border px-4 py-3 rounded-xl text-xs text-white focus:outline-none focus:border-cyan-500">
+                        <button onclick="sendAiPrompt()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-5 py-3 rounded-xl text-xs transition flex items-center gap-2">
+                            <span>পাঠান</span>
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- MODAL: BEST SKILL LEARNER AWARD CERTIFICATE -->
+    <div id="modal-award-certificate" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="card-dark rounded-3xl max-w-2xl w-full p-6 sm:p-8 relative gold-border shadow-2xl bg-gradient-to-b from-[#181330] via-[#0e0b1f] to-[#181330]">
+            <button onclick="closeLearnerAwardModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white p-2 text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="text-center space-y-5">
+                <div class="w-16 h-16 mx-auto rounded-full bg-gradient-to-tr from-amber-500 to-yellow-300 p-1 flex items-center justify-center shadow-lg shadow-amber-500/20">
+                    <div class="w-full h-full bg-[#131027] rounded-full flex items-center justify-center text-amber-400 text-2xl">
+                        <i class="fa-solid fa-crown"></i>
+                    </div>
+                </div>
+
+                <div>
+                    <span class="text-[10px] font-extrabold uppercase tracking-widest text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/30">
+                        OFFICIAL AWARD OF EXCELLENCE
+                    </span>
+                    <h2 class="text-2xl font-black text-white mt-2">BEST SKILL LEARNER AWARD</h2>
+                    <p class="text-xs text-gray-400">Graphics Design & E-Commerce Mastery 2026</p>
+                </div>
+
+                <div class="p-6 rounded-2xl bg-empdark-bg border border-purple-900/50 space-y-3">
+                    <p class="text-xs text-gray-400 uppercase tracking-widest">প্রদান করা হলো</p>
+                    <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-yellow-200">
+                        Robin Zehen
+                    </h1>
+                    <p class="text-xs text-gray-300 leading-relaxed max-w-md mx-auto">
+                        রবিনের অনন্য অধ্যবসায়, গ্রাফিক্স ডিজাইন ও ই-কমার্স শেখায় সর্বোচ্চ কনসিস্টেন্সি বজায় রাখার স্বীকৃতিস্বরূপ এই অ্যাওয়ার্ড প্রদান করা হলো।
+                    </p>
+                </div>
+
+                <div class="flex gap-3 justify-center pt-2">
+                    <button onclick="window.print()" class="btn-gradient text-white px-6 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2">
+                        <i class="fa-solid fa-print"></i> প্রিন্ট বা পিডিএফ সেভ করুন
+                    </button>
+                    <button onclick="closeLearnerAwardModal()" class="bg-empdark-bg border border-empdark-border text-gray-300 px-5 py-2.5 rounded-xl text-xs font-semibold hover:text-white">
+                        বন্ধ করুন
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: NEW ENTRY -->
+    <div id="modal-entry" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="card-dark rounded-2xl max-w-md w-full p-6 relative border border-purple-800/60 shadow-2xl">
+            <button onclick="closeEntryModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <h3 class="text-base font-bold text-white mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-plus text-purple-400"></i> নতুন তথ্য এন্ট্রি করুন
+            </h3>
+
+            <form onsubmit="handleNewEntry(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">এন্ট্রির ধরণ</label>
+                    <select id="entry-type" class="w-full bg-empdark-bg border border-empdark-border rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-purple-500">
+                        <option value="learning">শিক্ষা লগ (Learning History)</option>
+                        <option value="task">নতুন টু-ডু কাজ (New Task)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">শিরোনাম / বিষয়</label>
+                    <input type="text" id="entry-title" required placeholder="যেমন: Photoshop Pen Tool অনুশীলনী" class="w-full bg-empdark-bg border border-empdark-border rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-purple-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">বিস্তারিত নোট</label>
+                    <input type="text" id="entry-subtitle" placeholder="যেমন: ১ ঘণ্টা ৩০ মিনিট অনুশীলনী করা হয়েছে" class="w-full bg-empdark-bg border border-empdark-border rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-purple-500">
+                </div>
+
+                <button type="submit" class="w-full btn-gradient text-white py-2.5 rounded-xl text-xs font-bold shadow-lg">
+                    সেভ করুন
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 card-dark text-white border border-purple-500 px-4 py-3 rounded-xl shadow-2xl hidden z-50 flex items-center gap-3">
+        <i class="fa-solid fa-circle-check text-purple-400 text-lg"></i>
+        <span id="toast-text" class="text-xs font-medium">সফলভাবে সম্পন্ন হয়েছে!</span>
+    </div>
+
+    <script>
+        let currentUserName = "Robin Zehen";
+
+        let learningHistory = JSON.parse(localStorage.getItem('emp_learning')) || [
+            { id: 1, title: 'Photoshop Pen Tool & Layer Masking', duration: '১ ঘণ্টা ৪৫ মি.', date: '২০২৬-০৯-২০', desc: 'গ্রাফিক্স ডিজাইন: ই-কমার্স প্রোডাক্টের ব্যাকগ্রাউন্ড রিমুভাল।' },
+            { id: 2, title: 'Shopify Store Product Upload & SEO', duration: '১ ঘণ্টা', date: '২০২৬-০৯-১৯', desc: 'ই-কমার্স: উইনিং প্রোডাক্ট বিবরণ ও কাস্টমাইজেশন।' }
+        ];
+
+        let todoTasks = JSON.parse(localStorage.getItem('emp_tasks')) || [
+            { id: 101, text: 'Photoshop প্রোডাক্ট মকআপ ডিজাইন তৈরি করা', completed: true },
+            { id: 102, text: 'Shopify থিম কাস্টমাইজেশন প্রাকটিস', completed: true },
+            { id: 103, text: 'Facebook Ads Pixel সেটিং দেখা', completed: false }
+        ];
+
+        let timerSessions = JSON.parse(localStorage.getItem('emp_timer_sessions')) || [
+            { id: 201, date: '২০২৬-০৯-২০ (রবি)', topic: 'Graphics Design', startTime: '10:30 AM', durationSec: 5400, formattedDuration: '১ ঘণ্টা ৩০ মি.' },
+            { id: 202, date: '২০২৬-০৯-২০ (রবি)', topic: 'E-Commerce', startTime: '02:15 PM', durationSec: 3600, formattedDuration: '১ ঘণ্টা ০০ মি.' }
+        ];
+
+        const currentMonthDays = [
+            { day: 1, status: 1 }, { day: 2, status: 1 }, { day: 3, status: 1 },
+            { day: 4, status: 1 }, { day: 5, status: 0, reason: 'কনসিস্টেন্সি ব্রেক!' },
+            { day: 6, status: 1 }, { day: 7, status: 1 }, { day: 8, status: 1 },
+            { day: 9, status: 1 }, { day: 10, status: 1 }, { day: 11, status: 1 },
+            { day: 12, status: 1 }, { day: 13, status: 1, isToday: true }, { day: 14, status: 0 },
+            { day: 15, status: 0 }, { day: 16, status: 0 }, { day: 17, status: 0 },
+            { day: 18, status: 0 }, { day: 19, status: 0 }, { day: 20, status: 1 },
+            { day: 21, status: 0 }, { day: 22, status: 0 }, { day: 23, status: 0 },
+            { day: 24, status: 0 }, { day: 25, status: 0 }, { day: 26, status: 0 },
+            { day: 27, status: 0 }, { day: 28, status: 0 }, { day: 29, status: 0 }, { day: 30, status: 0 }
+        ];
+
+        let currentCertCategory = 'daily';
+        let isDailyCertUnlocked = false;
+
+        // Live Timer Variables
+        let timerInterval = null;
+        let timerSeconds = 0;
+        let isTimerRunning = false;
+        let timerStartTimeString = "";
+
+        let barChartInstance = null;
+        let donutChartInstance = null;
+
+        window.onload = function() {
+            renderRecentHistory();
+            renderTodos();
+            renderTimerSessions();
+            renderMonthlyCalendar();
+            initCharts();
+            checkMissedDayNotification();
+            checkDailyCertStatus();
+        };
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+
+            document.querySelectorAll('nav button').forEach(el => {
+                el.classList.remove('active-nav-pill');
+                el.classList.add('text-gray-300', 'hover:text-white', 'hover:bg-[#181435]');
+            });
+
+            const activeBtn = document.getElementById(`nav-${tabName}`);
+            if(activeBtn) {
+                activeBtn.classList.add('active-nav-pill');
+                activeBtn.classList.remove('text-gray-300', 'hover:text-white', 'hover:bg-[#181435]');
+            }
+
+            const titleMap = {
+                'dashboard': 'ড্যাশবোর্ড (Dashboard)',
+                'skill': '৬ মাসের মাস্টার চ্যালেঞ্জ (Graphics & E-Commerce)',
+                'timer': 'পড়া/কাজের টাইম ট্র্যাকার (Live Clock Logger)',
+                'learning': 'দৈনিক শিক্ষা নোট (Learning Log)',
+                'calendar': 'মাসিক ক্যালেন্ডার ও কনসিস্টেন্সি রিপোর্ট',
+                'tasks': 'প্রতিদিনের টু-ডু কাজ (Task Tracker)',
+                'achievements': 'অ্যাওয়ার্ড ও ব্যাজ (Best Learner)',
+                'certificate': 'সার্টিফিকেট গ্যালাক্সি (৪টি ক্যাটাগরি)',
+                'ai-assistant': 'EmpGen AI স্মার্ট লার্নিং অ্যাসিস্ট্যান্ট'
+            };
+            if(titleMap[tabName]) {
+                document.getElementById('page-header-title').innerText = titleMap[tabName];
+            }
+
+            if(window.innerWidth < 1024) {
+                document.getElementById('sidebar').classList.add('-translate-x-full');
+            }
+        }
+
+        // --- CERTIFICATE CATEGORY SWITCHING & LOCK CHECK ---
+        function checkDailyCertStatus() {
+            const allCompleted = todoTasks.length > 0 && todoTasks.every(t => t.completed);
+            isDailyCertUnlocked = allCompleted;
+
+            const badge = document.getElementById('daily-status-badge');
+            if(allCompleted) {
+                badge.innerText = "আনলকড 🔓";
+                badge.className = "text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+            } else {
+                badge.innerText = "লকড 🔒";
+                badge.className = "text-[9px] px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30";
+            }
+
+            if(currentCertCategory === 'daily') {
+                updateCertOverlay(allCompleted);
+            }
+        }
+
+        function updateCertOverlay(unlocked) {
+            const overlay = document.getElementById('cert-locked-overlay');
+            const btn = document.getElementById('cert-download-btn');
+            if(unlocked) {
+                overlay.classList.add('hidden');
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+                overlay.classList.remove('hidden');
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        function switchCertCategory(cat) {
+            currentCertCategory = cat;
+            
+            const btnDaily = document.getElementById('cert-cat-daily');
+            const btnWeekly = document.getElementById('cert-cat-weekly');
+            const btnMonthly = document.getElementById('cert-cat-monthly');
+            const btnOvertime = document.getElementById('cert-cat-overtime');
+
+            [btnDaily, btnWeekly, btnMonthly, btnOvertime].forEach(b => {
+                b.classList.remove('border-purple-500', 'text-white');
+                b.classList.add('text-gray-400');
+            });
+
+            const currentBtn = document.getElementById(`cert-cat-${cat}`);
+            currentBtn.classList.add('border-purple-500', 'text-white');
+            currentBtn.classList.remove('text-gray-400');
+
+            const title = document.getElementById('cert-category-title');
+            const desc = document.getElementById('cert-category-desc');
+            const badge = document.getElementById('cert-badge-type');
+            const body = document.getElementById('cert-body-text');
+
+            if(cat === 'daily') {
+                title.innerHTML = `<i class="fa-solid fa-calendar-day text-purple-400"></i> <span>১. দৈনিক অর্জন সার্টিফিকেট (Daily Certificate)</span>`;
+                desc.innerText = "আজকের সব নির্ধারিত টাস্ক সম্পন্ন হলে সার্টিফিকেট অফিশিয়ালি আনলক হবে।";
+                badge.innerText = "DAILY SKILL ACCOMPLISHMENT CERTIFICATE";
+                body.innerHTML = "সফলতা ও দক্ষতার সাথে EmpGen প্ল্যাটফর্মে আজকের দিনের নির্ধারিত **গ্রাফিক্স ডিজাইন ও ই-কমার্স লার্নিং** টাস্কগুলো ১০০% সম্পন্ন করেছেন।";
+                checkDailyCertStatus();
+            } else if(cat === 'weekly') {
+                title.innerHTML = `<i class="fa-solid fa-calendar-week text-emerald-400"></i> <span>২. সাপ্তাহিক কনসিস্টেন্সি সার্টিফিকেট (Weekly Certificate)</span>`;
+                desc.innerText = "সারা সপ্তাহ ধরে প্রতিদিনের পড়া ও কাজ সম্পূর্ণ করায় অর্জিত সেরা কনসিস্টেন্সি সম্মাননা।";
+                badge.innerText = "WEEKLY CONSISTENCY & SKILL CERTIFICATE";
+                body.innerHTML = "বিগত ১ সপ্তাহে মোট ২০ ঘণ্টার বেশি সময় ব্যয় করে **গ্রাফিক্স ও ই-কমার্স প্রাকটিস** সফলভাবে সম্পন্ন করার স্বীকৃতিস্বরূপ এই সার্টিফিকেট প্রদান করা হলো।";
+                updateCertOverlay(true);
+            } else if(cat === 'monthly') {
+                title.innerHTML = `<i class="fa-solid fa-calendar-check text-amber-400"></i> <span>৩. মাসিক মাস্টার সার্টিফিকেট (Monthly Certificate)</span>`;
+                desc.innerText = "পুরো মাস ধরে নিয়মিত পড়াশোনা ও দক্ষতার পরিচয় দেওয়ার জন্য মাসিক সার্টিফিকেট।";
+                badge.innerText = "MONTHLY MASTER LEARNER CERTIFICATE";
+                body.innerHTML = "এই মাসে ৯১%+ কনসিস্টেন্সি বজায় রেখে **গ্রাফিক্স ডিজাইন ও ই-কমার্স রোডম্যাপে** অসাধারণ অগ্রগতি অর্জন করেছেন।";
+                updateCertOverlay(true);
+            } else if(cat === 'overtime') {
+                title.innerHTML = `<i class="fa-solid fa-bolt text-fuchsia-400"></i> <span>৪. ওভারটাইম/এক্সট্রা আওয়ার সার্টিফিকেট (Extra Hour Master)</span>`;
+                desc.innerText = "দৈনিক নির্ধারিত ২.৫ ঘণ্টার বেশি পড়ালেখা ও অতিরিক্ত কাজ সম্পন্ন করার বিশেষ সম্মাননা।";
+                badge.innerText = "OVERTIME & HARDWORKER CERTIFICATE";
+                body.innerHTML = "সাধারণ টার্গেটের অতিরিক্ত সময় ব্যয় করে নিরলস পরিশ্রম ও টাইমার সেশন সম্পন্ন করার অনন্য দৃষ্টান্ত স্থাপন করেছেন।";
+                updateCertOverlay(true);
+            }
+        }
+
+        function printOrWarnCert() {
+            if(currentCertCategory === 'daily' && !isDailyCertUnlocked) {
+                showToast("দৈনিক কাজ সম্পন্ন না হলে সার্টিফিকেট প্রিন্ট করা যাবে না!");
+                return;
+            }
+            window.print();
+        }
+
+        // --- AI ASSISTANT FUNCTION ---
+        function sendAiPrompt() {
+            const input = document.getElementById('ai-input-prompt');
+            const chatBox = document.getElementById('ai-chat-box');
+            const prompt = input.value.trim();
+
+            if(!prompt) return;
+
+            // User Message
+            chatBox.innerHTML += `
+                <div class="flex items-start gap-3 justify-end">
+                    <div class="bg-purple-950 p-3 rounded-2xl text-xs text-purple-200 max-w-md border border-purple-800/50">
+                        ${prompt}
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white text-xs font-bold">ইউজার</div>
+                </div>
+            `;
+
+            input.value = "";
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Simulated AI Response
+            setTimeout(() => {
+                chatBox.innerHTML += `
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-full bg-cyan-600 flex items-center justify-center text-white text-xs font-bold">AI</div>
+                        <div class="bg-[#181435] p-3 rounded-2xl text-xs text-gray-200 max-w-md border border-purple-900/40">
+                            আপনার প্রশ্নের জন্য ধন্যবাদ! আপনার রোডম্যাপ অনুযায়ী কনসিস্টেন্সি বজায় রেখে দৈনিক প্রাকটিস চালিয়ে যান। এই বিষয়ে আর কোনো নির্দিষ্ট প্রশ্ন থাকলে আমাকে বলতে পারেন!
+                        </div>
+                    </div>
+                `;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }, 800);
+        }
+
+        // --- TIMER LOGIC ---
+        function startTimer() {
+            if (isTimerRunning) return;
+            isTimerRunning = true;
+
+            if (timerSeconds === 0) {
+                const now = new Date();
+                timerStartTimeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                document.getElementById('start-time-indicator').innerText = `কখন বসেছেন: ${timerStartTimeString}`;
+            }
+
+            document.getElementById('btn-timer-start').disabled = true;
+            document.getElementById('btn-timer-start').classList.add('opacity-50');
+            document.getElementById('btn-timer-pause').disabled = false;
+            document.getElementById('btn-timer-pause').classList.remove('opacity-50');
+            document.getElementById('btn-timer-stop').disabled = false;
+            document.getElementById('btn-timer-stop').classList.remove('opacity-50');
+
+            timerInterval = setInterval(() => {
+                timerSeconds++;
+                updateTimerDisplay();
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            if (!isTimerRunning) return;
+            isTimerRunning = false;
+            clearInterval(timerInterval);
+
+            document.getElementById('btn-timer-start').disabled = false;
+            document.getElementById('btn-timer-start').classList.remove('opacity-50');
+            document.getElementById('btn-timer-pause').disabled = true;
+            document.getElementById('btn-timer-pause').classList.add('opacity-50');
+        }
+
+        function stopAndSaveTimer() {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+
+            if (timerSeconds < 10) {
+                showToast('১০ সেকেন্ডের কম সময় সেভ করা যাবে না!');
+                resetTimerUI();
+                return;
+            }
+
+            const hrs = Math.floor(timerSeconds / 3600);
+            const mins = Math.floor((timerSeconds % 3600) / 60);
+            let durationStr = "";
+            if (hrs > 0) durationStr += `${hrs} ঘণ্টা `;
+            durationStr += `${mins} মিনিট`;
+
+            const topic = document.getElementById('timer-topic-select').value;
+            const todayStr = "২০২৬-০৯-২০ (রবি)";
+
+            const newSession = {
+                id: Date.now(),
+                date: todayStr,
+                topic: topic,
+                startTime: timerStartTimeString || "১০:০০ AM",
+                durationSec: timerSeconds,
+                formattedDuration: durationStr
+            };
+
+            timerSessions.unshift(newSession);
+            localStorage.setItem('emp_timer_sessions', JSON.stringify(timerSessions));
+
+            renderTimerSessions();
+            showToast('পড়ার সেশন সেভ করা হয়েছে!');
+            resetTimerUI();
+        }
+
+        function resetTimerUI() {
+            timerSeconds = 0;
+            updateTimerDisplay();
+            document.getElementById('start-time-indicator').innerText = "কখন বসেছেন: --:--";
+            document.getElementById('btn-timer-start').disabled = false;
+            document.getElementById('btn-timer-start').classList.remove('opacity-50');
+            document.getElementById('btn-timer-pause').disabled = true;
+            document.getElementById('btn-timer-pause').classList.add('opacity-50');
+            document.getElementById('btn-timer-stop').disabled = true;
+            document.getElementById('btn-timer-stop').classList.add('opacity-50');
+        }
+
+        function updateTimerDisplay() {
+            const hrs = Math.floor(timerSeconds / 3600);
+            const mins = Math.floor((timerSeconds % 3600) / 60);
+            const secs = timerSeconds % 60;
+            const formatted = `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            document.getElementById('timer-display').innerText = formatted;
+        }
+
+        function renderTimerSessions() {
+            const tbody = document.getElementById('timer-sessions-tbody');
+            const recentContainer = document.getElementById('recent-timer-logs');
+
+            if (timerSessions.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-gray-500">কোনো পড়ার সেশন এখনো রেকর্ড হয়নি</td></tr>`;
+                recentContainer.innerHTML = `<p class="text-xs text-gray-500">কোনো টাইমার ডাটা নেই</p>`;
+                return;
+            }
+
+            tbody.innerHTML = timerSessions.map(s => `
+                <tr class="hover:bg-empdark-bg/50">
+                    <td class="py-3 font-semibold text-white">${s.date}</td>
+                    <td class="py-3"><span class="bg-purple-900/60 text-purple-300 font-bold text-[10px] px-2 py-0.5 rounded-md">${s.topic}</span></td>
+                    <td class="py-3 text-gray-400">${s.startTime}</td>
+                    <td class="py-3 font-bold text-emerald-400">${s.formattedDuration}</td>
+                    <td class="py-3 text-right">
+                        <button onclick="deleteTimerSession(${s.id})" class="text-gray-500 hover:text-rose-400">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+
+            recentContainer.innerHTML = timerSessions.slice(0, 3).map(s => `
+                <div class="bg-empdark-bg p-3.5 rounded-xl border border-empdark-border flex justify-between items-center">
+                    <div class="space-y-1">
+                        <span class="bg-purple-900/60 text-purple-300 font-bold text-[10px] px-2 py-0.5 rounded-md">${s.topic}</span>
+                        <p class="text-xs font-bold text-white mt-1">শুরু: ${s.startTime}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs font-extrabold text-emerald-400">${s.formattedDuration}</p>
+                        <p class="text-[10px] text-gray-500">${s.date}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function deleteTimerSession(id) {
+            timerSessions = timerSessions.filter(s => s.id !== id);
+            localStorage.setItem('emp_timer_sessions', JSON.stringify(timerSessions));
+            renderTimerSessions();
+            showToast('সেশন রিমুভ করা হয়েছে');
+        }
+
+        // --- MONTHLY CALENDAR RENDER ---
+        function renderMonthlyCalendar() {
+            const grid = document.getElementById('monthly-calendar-grid');
+            grid.innerHTML = currentMonthDays.map(d => {
+                let colorClass = "bg-empdark-bg border-empdark-border text-gray-400";
+                let badge = "";
+
+                if (d.status === 1) {
+                    colorClass = "bg-emerald-950/40 border-emerald-800/60 text-emerald-300 font-bold";
+                    badge = `<i class="fa-solid fa-circle-check text-[10px] text-emerald-400"></i>`;
+                } else if (d.status === 0 && d.day <= 13) {
+                    colorClass = "bg-rose-950/80 border-rose-600 text-rose-200 font-black shadow-lg shadow-rose-950/50";
+                    badge = `<i class="fa-solid fa-xmark text-[10px] text-rose-400"></i>`;
+                }
+
+                return `
+                    <div class="p-3 rounded-2xl border flex flex-col justify-between h-20 relative ${colorClass}">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs">${d.day}</span>
+                            ${badge}
+                        </div>
+                        ${d.status === 0 && d.day <= 13 ? `<span class="text-[9px] text-rose-300 font-bold">মিসড!</span>` : ''}
+                        ${d.status === 1 ? `<span class="text-[9px] text-emerald-400">সক্রিয়</span>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function checkMissedDayNotification() {
+            const hasMissed = currentMonthDays.some(d => d.status === 0 && d.day <= 13);
+            const banner = document.getElementById('missed-day-alert-banner');
+            if (hasMissed && banner) {
+                banner.classList.remove('hidden');
+            }
+        }
+
+        function toggleRoadmapItem(id) {
+            showToast('রোডম্যাপ আপডেট করা হয়েছে!');
+        }
+
+        // --- LEARNING HISTORY & TODOS ---
+        function renderRecentHistory() {
+            const fullContainer = document.getElementById('learning-full-list');
+            fullContainer.innerHTML = learningHistory.map(item => `
+                <div class="card-dark p-4 rounded-xl border border-empdark-border space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="bg-purple-900/60 text-purple-300 font-bold text-xs px-2.5 py-1 rounded-md">${item.duration}</span>
+                        <span class="text-xs text-gray-400">${item.date}</span>
+                    </div>
+                    <h4 class="text-sm font-bold text-white">${item.title}</h4>
+                    <p class="text-xs text-gray-400">${item.desc}</p>
+                </div>
+            `).join('');
+        }
+
+        function renderTodos() {
+            const todayContainer = document.getElementById('today-todo-list');
+            const allContainer = document.getElementById('all-tasks-manage-list');
+
+            todayContainer.innerHTML = todoTasks.map(t => `
+                <div class="flex items-center justify-between p-2.5 rounded-xl bg-empdark-bg border border-empdark-border">
+                    <label class="flex items-center gap-3 cursor-pointer text-xs text-gray-300 ${t.completed ? 'line-through text-gray-500' : ''}">
+                        <input type="checkbox" ${t.completed ? 'checked' : ''} onchange="toggleTask(${t.id})" class="rounded accent-purple-600 bg-empdark-bg w-4 h-4">
+                        <span>${t.text}</span>
+                    </label>
+                </div>
+            `).join('');
+
+            allContainer.innerHTML = todoTasks.map(t => `
+                <div class="flex items-center justify-between p-3 rounded-xl bg-empdark-bg border border-empdark-border">
+                    <label class="flex items-center gap-3 cursor-pointer text-xs text-gray-300 ${t.completed ? 'line-through text-gray-500' : ''}">
+                        <input type="checkbox" ${t.completed ? 'checked' : ''} onchange="toggleTask(${t.id})" class="rounded accent-purple-600 w-4 h-4">
+                        <span>${t.text}</span>
+                    </label>
+                    <button onclick="deleteTask(${t.id})" class="text-gray-500 hover:text-rose-400 text-xs">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function toggleTask(id) {
+            const task = todoTasks.find(t => t.id === id);
+            if (task) {
+                task.completed = !task.completed;
+                localStorage.setItem('emp_tasks', JSON.stringify(todoTasks));
+                renderTodos();
+                checkDailyCertStatus();
+                showToast('টাস্ক স্ট্যাটাস আপডেট হয়েছে!');
+            }
+        }
+
+        function deleteTask(id) {
+            todoTasks = todoTasks.filter(t => t.id !== id);
+            localStorage.setItem('emp_tasks', JSON.stringify(todoTasks));
+            renderTodos();
+            checkDailyCertStatus();
+            showToast('টাস্ক মুছে ফেলা হয়েছে');
+        }
+
+        function openLearnerAwardModal() { document.getElementById('modal-award-certificate').classList.remove('hidden'); }
+        function closeLearnerAwardModal() { document.getElementById('modal-award-certificate').classList.add('hidden'); }
+        function openEntryModal() { document.getElementById('modal-entry').classList.remove('hidden'); }
+        function closeEntryModal() { document.getElementById('modal-entry').classList.add('hidden'); }
+
+        function handleNewEntry(e) {
+            e.preventDefault();
+            const type = document.getElementById('entry-type').value;
+            const title = document.getElementById('entry-title').value;
+            const subtitle = document.getElementById('entry-subtitle').value;
+
+            if (type === 'learning') {
+                learningHistory.unshift({
+                    id: Date.now(),
+                    title: title,
+                    duration: subtitle || '১ ঘণ্টা',
+                    date: '২০২৬-০৯-২০',
+                    desc: subtitle ? `নোট: ${subtitle}` : 'দৈনিক নতুন শিখন তথ্য।'
+                });
+                localStorage.setItem('emp_learning', JSON.stringify(learningHistory));
+                renderRecentHistory();
+            } else {
+                todoTasks.push({ id: Date.now(), text: title, completed: false });
+                localStorage.setItem('emp_tasks', JSON.stringify(todoTasks));
+                renderTodos();
+                checkDailyCertStatus();
+            }
+
+            closeEntryModal();
+            showToast('নতুন তথ্য সেভ করা হয়েছে!');
+            e.target.reset();
+        }
+
+        function updateCertName(val) {
+            document.getElementById('cert-display-name').innerText = val || "Robin Zehen";
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-text').innerText = msg;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+
+        function initCharts() {
+            const ctx1 = document.getElementById('barChartLearning').getContext('2d');
+            barChartInstance = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['সোম', 'মঙ্গল', 'বুধ', 'বৃহঃ', 'শুক্র', 'শনি', 'রবি'],
+                    datasets: [{
+                        label: 'শেখার সময় (ঘণ্টা)',
+                        data: [2.5, 3.0, 1.5, 0.0, 2.0, 3.5, 2.5],
+                        backgroundColor: '#8b5cf6',
+                        borderRadius: 6,
+                        hoverBackgroundColor: '#a78bfa'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: '#9ca3af', font: { family: 'Hind Siliguri', size: 11 } } },
+                        y: { grid: { color: '#231d45' }, ticks: { color: '#9ca3af', font: { family: 'Hind Siliguri', size: 11 } }, beginAtZero: true }
+                    }
+                }
+            });
+
+            const ctx2 = document.getElementById('donutChartTasks').getContext('2d');
+            donutChartInstance = new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: ['গ্রাফিক্স ডিজাইন', 'ই-কমার্স', 'অন্যান্য'],
+                    datasets: [{
+                        data: [45, 40, 15],
+                        backgroundColor: ['#8b5cf6', '#d946ef', '#231d45'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { color: '#9ca3af', font: { family: 'Hind Siliguri', size: 11 } } } },
+                    cutout: '70%'
+                }
+            });
+        }
+    </script>
+</body>
+</html>
